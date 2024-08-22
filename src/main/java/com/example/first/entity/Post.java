@@ -9,13 +9,13 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name = "users")
+@Table(name = "posts")
 @Getter
 @Setter
-public class User {
+public class Post {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    private String username;
-    private String password;
+    private String title;
+    private String userId;
 }
