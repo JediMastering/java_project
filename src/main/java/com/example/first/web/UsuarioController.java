@@ -3,6 +3,7 @@ package com.example.first.web;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,7 +13,6 @@ import com.example.first.dto.UsuarioDTO;
 import com.example.first.entity.Usuarios;
 import com.example.first.service.UsuarioService;
 
-import jakarta.validation.Valid;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -31,13 +31,8 @@ public class UsuarioController {
     private UsuarioService usuarioService;
 
     @PostMapping("/register")
-    public ResponseEntity<UsuarioDTO> createUser(@Valid @RequestBody Usuarios user) {
+    public ResponseEntity<UsuarioDTO> createUser(@Validated @RequestBody Usuarios user) {
         return ResponseEntity.ok(usuarioService.createUser(user));
-    }
-    
-    @PostMapping("/register1")
-    public ResponseEntity<Void> teste(@Valid @RequestBody UsuarioDTO user) {
-        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/")

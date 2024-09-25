@@ -1,7 +1,5 @@
 package com.example.first.service;
 
-import java.util.Optional;
-
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -14,15 +12,13 @@ import com.example.first.dto.UsuarioDTO;
 import com.example.first.entity.Usuarios;
 import com.example.first.repository.UsuarioRepository;
 
-import jakarta.validation.Valid;
-
 @Service
 public class UsuarioService {
     @Autowired
     private UsuarioRepository usuarioRepository;
 
     @Transactional
-    public UsuarioDTO createUser(@Valid Usuarios user) {
+    public UsuarioDTO createUser(Usuarios user) {
         return toDTO(usuarioRepository.save(user));
     }
 
