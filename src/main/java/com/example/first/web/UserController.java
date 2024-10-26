@@ -1,51 +1,65 @@
 package com.example.first.web;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import com.example.first.entity.User;
-import com.example.first.service.UserService;
-
-import lombok.AllArgsConstructor;
-import java.util.Optional;
-
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
+
+import com.example.first.dto.CreateUserDto;
+import com.example.first.entity.Role;
+import com.example.first.entity.User;
+import com.example.first.repository.RoleRepository;
+import com.example.first.repository.UserRepository;
+
+import jakarta.transaction.Transactional;
 
 import java.util.List;
+import java.util.Set;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-@AllArgsConstructor
 @RestController
-@RequestMapping("/user")
 public class UserController {
-    UserService userService;
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
+    private final BCryptPasswordEncoder passwordEncoder;
 
-    @GetMapping("/")
-    public ResponseEntity<List<User>> getUsers() {
-        List<User> users = userService.findAll();
-        return new ResponseEntity<>(users, HttpStatus.OK);
+    public UserController(UserRepository userRepository,
+            RoleRepository roleRepository,
+            BCryptPasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Optional<User>> findById(@PathVariable Long id) {
-        return new ResponseEntity<>(userService.getUser(id), HttpStatus.OK);
+    @Transactional
+    @PostMapping("/users")
+    public ResponseEntity<Void> newUser(@RequestBody CreateUserDto dto) {
+
+        var basicRole = roleRepository.findByName(Role.Values.BASIC.name());
+
+        var userFromDb = userRepository.findByUsername(dto.username());
+        if (userFromDb.isPresent()) {
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY);
+        }
+
+        var user = new User();
+        user.setUsername(dto.username());
+        user.setPassword(passwordEncoder.encode(dto.password()));
+        user.setRoles(Set.of(basicRole));
+
+        userRepository.save(user);
+
+        return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/register")
-    public ResponseEntity<HttpStatus> createUser(@RequestBody User user) {
-        userService.saveUser(user);
-
-        return new ResponseEntity<>(HttpStatus.CREATED);
+    @GetMapping("/users")
+    @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
+    public ResponseEntity<List<User>> listUsers() {
+        var users = userRepository.findAll();
+        return ResponseEntity.ok(users);
     }
-
-    @DeleteMapping("/{id}")
-    public void deleteById(@PathVariable Long id) {
-        userService.deleteUserById(id);
-    }
-
 }
