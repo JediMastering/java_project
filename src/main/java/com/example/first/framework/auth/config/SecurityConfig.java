@@ -1,4 +1,4 @@
-package com.example.first.config;
+package com.example.first.framework.auth.config;
 
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.JWKSet;

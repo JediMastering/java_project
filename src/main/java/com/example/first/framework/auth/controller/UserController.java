@@ -1,4 +1,4 @@
-package com.example.first.web;
+package com.example.first.framework.auth.controller;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -6,11 +6,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.example.first.dto.CreateUserDto;
-import com.example.first.entity.Role;
-import com.example.first.entity.User;
-import com.example.first.repository.RoleRepository;
-import com.example.first.repository.UserRepository;
+import com.example.first.framework.auth.dto.CreateUserDto;
+import com.example.first.framework.auth.entity.Role;
+import com.example.first.framework.auth.entity.User;
+import com.example.first.framework.auth.repository.RoleRepository;
+import com.example.first.framework.auth.repository.UserRepository;
 
 import jakarta.transaction.Transactional;
 

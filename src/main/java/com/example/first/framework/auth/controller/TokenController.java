@@ -1,4 +1,4 @@
-package com.example.first.web;
+package com.example.first.framework.auth.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -10,10 +10,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.first.dto.LoginRequest;
-import com.example.first.dto.LoginResponse;
-import com.example.first.entity.Role;
-import com.example.first.repository.UserRepository;
+import com.example.first.framework.auth.dto.LoginRequest;
+import com.example.first.framework.auth.dto.LoginResponse;
+import com.example.first.framework.auth.entity.Role;
+import com.example.first.framework.auth.repository.UserRepository;
 
 import java.time.Instant;
 import java.util.stream.Collectors;

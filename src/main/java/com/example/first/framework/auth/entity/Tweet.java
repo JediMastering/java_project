@@ -1,4 +1,4 @@
-package com.example.first.entity;
+package com.example.first.framework.auth.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;

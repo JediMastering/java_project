@@ -11,10 +11,10 @@ import org.springframework.web.server.ResponseStatusException;
 import com.example.first.dto.CreateTweetDto;
 import com.example.first.dto.FeedDto;
 import com.example.first.dto.FeedItemDto;
-import com.example.first.entity.Role;
-import com.example.first.entity.Tweet;
-import com.example.first.repository.TweetRepository;
-import com.example.first.repository.UserRepository;
+import com.example.first.framework.auth.entity.Role;
+import com.example.first.framework.auth.entity.Tweet;
+import com.example.first.framework.auth.repository.TweetRepository;
+import com.example.first.framework.auth.repository.UserRepository;
 
 import java.util.UUID;
 

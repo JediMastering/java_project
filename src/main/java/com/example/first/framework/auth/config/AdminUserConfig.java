@@ -1,14 +1,14 @@
-package com.example.first.config;
+package com.example.first.framework.auth.config;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.first.entity.Role;
-import com.example.first.entity.User;
-import com.example.first.repository.RoleRepository;
-import com.example.first.repository.UserRepository;
+import com.example.first.framework.auth.entity.Role;
+import com.example.first.framework.auth.entity.User;
+import com.example.first.framework.auth.repository.RoleRepository;
+import com.example.first.framework.auth.repository.UserRepository;
 
 import java.util.Set;
 

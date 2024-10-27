@@ -1,4 +1,4 @@
-package com.example.first.entity;
+package com.example.first.framework.auth.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -6,7 +6,7 @@ import lombok.Setter;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import com.example.first.dto.LoginRequest;
+import com.example.first.framework.auth.dto.LoginRequest;
 
 import java.util.Set;
 import java.util.UUID;

@@ -1,11 +1,11 @@
-package com.example.first.service;
+package com.example.first.framework.auth.service;
 
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.example.first.entity.User;
-import com.example.first.repository.UserRepository;
+import com.example.first.framework.auth.entity.User;
+import com.example.first.framework.auth.repository.UserRepository;
 
 import lombok.AllArgsConstructor;
 

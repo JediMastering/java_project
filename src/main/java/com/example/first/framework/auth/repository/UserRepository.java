@@ -1,8 +1,9 @@
-package com.example.first.repository;
+package com.example.first.framework.auth.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.example.first.entity.User;
+import com.example.first.framework.auth.entity.User;
+
 import java.util.Optional;
 import java.util.UUID;
 
