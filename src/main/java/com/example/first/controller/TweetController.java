@@ -1,4 +1,4 @@
-package com.example.first.web;
+package com.example.first.controller;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -11,12 +11,12 @@ import org.springframework.web.server.ResponseStatusException;
 import com.example.first.dto.CreateTweetDto;
 import com.example.first.dto.FeedDto;
 import com.example.first.dto.FeedItemDto;
+import com.example.first.entity.Tweet;
 import com.example.first.framework.auth.entity.Role;
-import com.example.first.framework.auth.entity.Tweet;
-import com.example.first.framework.auth.repository.TweetRepository;
 import com.example.first.framework.auth.repository.UserRepository;
+import com.example.first.repository.TweetRepository;
 
-import java.util.UUID;
+import java.math.BigInteger;
 
 @RestController
 public class TweetController {
@@ -50,7 +50,7 @@ public class TweetController {
     @PostMapping("/tweets")
     public ResponseEntity<Void> createTweet(@RequestBody CreateTweetDto dto,
                                             JwtAuthenticationToken token) {
-        var user = userRepository.findById(UUID.fromString(token.getName()));
+        var user = userRepository.findById(new BigInteger(token.getName()));
 
         var tweet = new Tweet();
         tweet.setUser(user.get());
@@ -64,7 +64,7 @@ public class TweetController {
     @DeleteMapping("/tweets/{id}")
     public ResponseEntity<Void> deleteTweet(@PathVariable("id") Long tweetId,
                                             JwtAuthenticationToken token) {
-        var user = userRepository.findById(UUID.fromString(token.getName()));
+        var user = userRepository.findById(new BigInteger(token.getName()));
         var tweet = tweetRepository.findById(tweetId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
@@ -72,7 +72,7 @@ public class TweetController {
                 .stream()
                 .anyMatch(role -> role.getName().equalsIgnoreCase(Role.Values.ADMIN.name()));
 
-        if (isAdmin || tweet.getUser().getUserId().equals(UUID.fromString(token.getName()))) {
+        if (isAdmin || tweet.getUser().getUserId().equals(new BigInteger(token.getName()))) {
             tweetRepository.deleteById(tweetId);
 
         } else {
