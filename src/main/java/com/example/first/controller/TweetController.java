@@ -50,7 +50,7 @@ public class TweetController {
     @PostMapping("/tweets")
     public ResponseEntity<Void> createTweet(@RequestBody CreateTweetDto dto,
                                             JwtAuthenticationToken token) {
-        var user = userRepository.findById(new BigInteger(token.getName()));
+        var user = userRepository.findById(Long.parseLong(token.getName()));
 
         var tweet = new Tweet();
         tweet.setUser(user.get());
@@ -64,7 +64,7 @@ public class TweetController {
     @DeleteMapping("/tweets/{id}")
     public ResponseEntity<Void> deleteTweet(@PathVariable("id") Long tweetId,
                                             JwtAuthenticationToken token) {
-        var user = userRepository.findById(new BigInteger(token.getName()));
+        var user = userRepository.findById(Long.parseLong(token.getName()));
         var tweet = tweetRepository.findById(tweetId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
@@ -72,7 +72,7 @@ public class TweetController {
                 .stream()
                 .anyMatch(role -> role.getName().equalsIgnoreCase(Role.Values.ADMIN.name()));
 
-        if (isAdmin || tweet.getUser().getUserId().equals(new BigInteger(token.getName()))) {
+        if (isAdmin || tweet.getUser().getUserId().equals(Long.parseLong(token.getName()))) {
             tweetRepository.deleteById(tweetId);
 
         } else {

@@ -9,7 +9,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import com.example.first.framework.auth.dto.LoginRequest;
 
 import java.util.Set;
-import java.util.UUID;
 
 @Entity
 @Table(name = "tb_users")
@@ -18,9 +17,9 @@ import java.util.UUID;
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
-    private UUID userId;
+    private Long userId;
 
     @Column(unique = true)
     private String username;
