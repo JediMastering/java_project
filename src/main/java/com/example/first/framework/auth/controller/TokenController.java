@@ -3,35 +3,24 @@ package com.example.first.framework.auth.controller;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.oauth2.jwt.JwtClaimsSet;
-import org.springframework.security.oauth2.jwt.JwtEncoder;
-import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.first.framework.auth.TokenService;
 import com.example.first.framework.auth.dto.LoginRequest;
 import com.example.first.framework.auth.dto.LoginResponse;
-import com.example.first.framework.auth.entity.Role;
 import com.example.first.framework.auth.repository.UserRepository;
 
-import java.time.Instant;
-import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 
+
+@RequiredArgsConstructor
 @RestController
 public class TokenController {
-
-    private final JwtEncoder jwtEncoder;
     private final UserRepository userRepository;
-    private BCryptPasswordEncoder passwordEncoder;
-
-    public TokenController(JwtEncoder jwtEncoder,
-                           UserRepository userRepository,
-                           BCryptPasswordEncoder passwordEncoder) {
-        this.jwtEncoder = jwtEncoder;
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-    }
+    private final BCryptPasswordEncoder passwordEncoder;
+    private final TokenService tokenService;
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest loginRequest) {
@@ -42,23 +31,12 @@ public class TokenController {
             throw new BadCredentialsException("user or password is invalid!");
         }
 
-        var now = Instant.now();
-        var expiresIn = 300L;
+        Long expiresIn = 300L;
+        Long refreshToken = 3000L;
 
-        var scopes = user.get().getRoles()
-                .stream()
-                .map(Role::getName)
-                .collect(Collectors.joining(" "));
-
-        var claims = JwtClaimsSet.builder()
-                .issuer("mybackend")
-                .subject(user.get().getUserId().toString())
-                .issuedAt(now)
-                .expiresAt(now.plusSeconds(expiresIn))
-                .claim("scope", scopes)
-                .build();
-
-        var jwtValue = jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
+        String jwtValue = tokenService.getGeneratedJwt(user.get(),expiresIn);
+        String uuidString = tokenService.getGeneratedRefreshToken(refreshToken);
+        tokenService.SaveNewToken(user.get(), jwtValue, expiresIn, uuidString, refreshToken);
 
         return ResponseEntity.ok(new LoginResponse(jwtValue, expiresIn));
     }

@@ -7,3 +7,15 @@ create table if not exists tb_tweets_seq (next_val bigint) engine=InnoDB;
 
 INSERT IGNORE INTO tb_roles (role_id, name) VALUES (1, 'admin');
 INSERT IGNORE INTO tb_roles (role_id, name) VALUES (2, 'basic');
+
+CREATE TABLE IF NOT EXISTS tb_tokens (
+    id BIGINT NOT NULL AUTO_INCREMENT,
+    user_id BIGINT NOT NULL,
+    access_token VARCHAR(512) NOT NULL,
+    access_token_expiration DATETIME NOT NULL,
+    refresh_token VARCHAR(512) NOT NULL,
+    refresh_token_expiration DATETIME NOT NULL,
+    is_active INT,
+    PRIMARY KEY (id),
+    FOREIGN KEY (user_id) REFERENCES tb_users(user_id)  -- Relaciona com a tabela tb_users
+) ENGINE=InnoDB;
