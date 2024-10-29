@@ -35,8 +35,7 @@ public class TokenController {
         Long refreshToken = 3000L;
 
         String jwtValue = tokenService.getGeneratedJwt(user.get(),expiresIn);
-        String uuidString = tokenService.getGeneratedRefreshToken(refreshToken);
-        tokenService.SaveNewToken(user.get(), jwtValue, expiresIn, uuidString, refreshToken);
+        tokenService.saveNewToken(user.get(), jwtValue, expiresIn, refreshToken);
 
         return ResponseEntity.ok(new LoginResponse(jwtValue, expiresIn));
     }

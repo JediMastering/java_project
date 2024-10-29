@@ -13,7 +13,6 @@ CREATE TABLE IF NOT EXISTS tb_tokens (
     user_id BIGINT NOT NULL,
     access_token VARCHAR(512) NOT NULL,
     access_token_expiration DATETIME NOT NULL,
-    refresh_token VARCHAR(512) NOT NULL,
     refresh_token_expiration DATETIME NOT NULL,
     is_active INT,
     PRIMARY KEY (id),

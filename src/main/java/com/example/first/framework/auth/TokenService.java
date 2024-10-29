@@ -9,12 +9,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
+import org.springframework.stereotype.Service;
 
 import com.example.first.framework.auth.entity.Role;
 import com.example.first.framework.auth.entity.Token;
 import com.example.first.framework.auth.entity.User;
 import com.example.first.framework.auth.repository.TokenRepository;
 
+@Service
 public class TokenService {
     @Autowired
     private JwtEncoder jwtEncoder;
@@ -41,18 +43,18 @@ public class TokenService {
         return jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
     }
 
-    public String getGeneratedRefreshToken(Long refreshToken) {
-        return UUID.randomUUID().toString();
-    }
-
-    public void SaveNewToken(User user, String jwtValue, Long expiresIn, String uuidString, Long refreshToken) {
+    public void saveNewToken(User user, String jwtValue, Long expiresIn, Long refreshToken) {
         Token token = new Token();
         token.setUser(user);
         token.setAccessToken(jwtValue);
         token.setAccessTokenExpiration(LocalDateTime.now().plusSeconds(expiresIn));
-        token.setRefreshToken(uuidString);
         token.setRefreshTokenExpiration(LocalDateTime.now().plusSeconds(refreshToken));
         token.setIsActive(1);
+        tokenRepository.save(token);
+    }
+
+    public void setTokenAsInactive(Token token){
+        token.setIsActive(null);
         tokenRepository.save(token);
     }
 }

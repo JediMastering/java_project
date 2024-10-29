@@ -20,10 +20,6 @@ import java.util.Optional;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-
-    // private final JwtService jwtService;
-    // private final UserDetailsService userDetailsService;
-
     @Autowired
     private TokenRepository tokenRepository;
 
@@ -44,29 +40,39 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         jwt = authHeader.substring(7); // Remove "Bearer " para pegar o token puro
-        Optional<Token> token = tokenRepository.findByAccessTokenAndIsActive(jwt,1);
+        Optional<Token> token = tokenRepository.findByAccessTokenAndIsActive(jwt, 1);
 
-        if(token.isEmpty()){
+        if (token.isEmpty()) {
             throw new BadCredentialsException("Token is not active!");
         }
-        
-        //AJUSTAR A LÓGICA A PARTIR DESTE PONTO
+
         LocalDateTime now = LocalDateTime.now();
 
-        if(token.get().getRefreshTokenExpiration().isBefore(now)){
+        if (token.get().getRefreshTokenExpiration().isBefore(now)) {
             throw new BadCredentialsException("Token is not active!");
         }
 
-        if(token.get().getAccessTokenExpiration().isBefore(now)){
+        if (token.get().getAccessTokenExpiration().isBefore(now)) {
             Long expiresIn = 300L;
             Long refreshToken = 3000L;
-    
-            String jwtValue = tokenService.getGeneratedJwt(token.get().getUser(),expiresIn);
-            String uuidString = tokenService.getGeneratedRefreshToken(refreshToken);
-            tokenService.SaveNewToken(token.get().getUser(), jwtValue, expiresIn, uuidString, refreshToken);
+
+            String jwtValue = tokenService.getGeneratedJwt(token.get().getUser(), expiresIn);
+            tokenService.setTokenAsInactive(token.get());
+            tokenService.saveNewToken(token.get().getUser(), jwtValue, expiresIn, refreshToken);
+
+            // Configura a resposta com os novos tokens
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+            response.setStatus(203);
+
+            String jsonResponse = String.format(
+                    "{\"accessToken\": \"%s\"}",
+                    jwtValue);
+
+            response.getWriter().write(jsonResponse);
+            response.getWriter().flush();
         }
 
         filterChain.doFilter(request, response);
     }
 }
-

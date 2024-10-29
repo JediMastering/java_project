@@ -23,9 +23,6 @@ public class Token {
     @Column(name = "access_token_expiration", nullable = false)
     private LocalDateTime accessTokenExpiration;
 
-    @Column(name = "refresh_token", nullable = false, length = 512)
-    private String refreshToken;
-
     @Column(name = "refresh_token_expiration", nullable = false)
     private LocalDateTime refreshTokenExpiration;
 
