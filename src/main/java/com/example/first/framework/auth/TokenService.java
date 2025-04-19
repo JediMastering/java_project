@@ -2,7 +2,6 @@ package com.example.first.framework.auth;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
