@@ -31,7 +31,7 @@ public class AdminUserConfig implements CommandLineRunner {
     @Transactional
     public void run(String... args) throws Exception {
 
-        var roleAdmin = roleRepository.findByName(Role.Values.ADMIN.name());
+        var roleAdmin = roleRepository.findByName(Role.Values.ADMIN.name()).orElseThrow(() -> new RuntimeException("Role not found"));
 
         var userAdmin = userRepository.findByUsername("admin");
 

@@ -1,21 +1,21 @@
 package com.example.first.service;
 
-import java.util.List;
+import com.example.first.dto.CreateUserDto;
+import com.example.first.dto.UserDTO;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
-import org.springframework.stereotype.Service;
+import java.util.UUID;
 
-import com.example.first.entity.User;
-import com.example.first.repository.UserRepository;
+public interface UserService {
 
-import lombok.AllArgsConstructor;
+    UserDTO createUser(CreateUserDto createUserDto);
 
-@Service
-@AllArgsConstructor
-public class UserService {
+    Page<UserDTO> getAllUsers(Pageable pageable);
 
-    private UserRepository userRepository;
+    UserDTO getUserById(UUID userId);
 
-    public List<User> findAll(){
-        return userRepository.findAll();
-    }
+    void deleteUser(UUID userId);
+
+    UserDTO updateUser(UUID userId, CreateUserDto createUserDto);
 }

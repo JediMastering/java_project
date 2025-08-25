@@ -10,6 +10,5 @@ import com.example.first.entity.Usuarios;
 public interface UsuarioRepository extends JpaRepository<Usuarios, Long> {
     Optional<Usuarios> findByLogin(String login);
 
-    @SuppressWarnings("null")
     Page<Usuarios> findAll(Pageable pageable);
 }
