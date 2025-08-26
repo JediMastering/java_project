@@ -3,6 +3,7 @@ package com.example.first.web;
 import com.example.first.dto.CreateUserDto;
 import com.example.first.dto.UserDTO;
 import com.example.first.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +22,7 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<UserDTO> createUser(@RequestBody CreateUserDto createUserDto) {
+    public ResponseEntity<UserDTO> createUser(@RequestBody @Valid CreateUserDto createUserDto) {
         UserDTO createdUser = userService.createUser(createUserDto);
         return ResponseEntity.ok(createdUser);
     }
@@ -39,7 +40,7 @@ public class UserController {
     }
 
     @PutMapping("/{userId}")
-    public ResponseEntity<UserDTO> updateUser(@PathVariable UUID userId, @RequestBody CreateUserDto createUserDto) {
+    public ResponseEntity<UserDTO> updateUser(@PathVariable UUID userId, @RequestBody @Valid CreateUserDto createUserDto) {
         UserDTO updatedUser = userService.updateUser(userId, createUserDto);
         return ResponseEntity.ok(updatedUser);
     }
