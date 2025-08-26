@@ -2,6 +2,7 @@ package com.example.first.service.impl;
 
 import com.example.first.dto.CreateUserDto;
 import com.example.first.dto.UserDTO;
+import com.example.first.dto.UserFilter;
 import com.example.first.entity.Role;
 import com.example.first.entity.User;
 import com.example.first.exception.EntityNotFoundException;
@@ -50,8 +51,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Page<UserDTO> getAllUsers(Pageable pageable) {
-        return userRepository.findAll(pageable)
+    public Page<UserDTO> getAllUsers(UserFilter userFilter, Pageable pageable) {
+        return userRepository.findAll(userFilter, pageable)
                 .map(user -> new UserDTO(user.getUserId(), user.getUsername()));
     }
 

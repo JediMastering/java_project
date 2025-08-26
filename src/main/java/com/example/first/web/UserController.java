@@ -2,6 +2,7 @@ package com.example.first.web;
 
 import com.example.first.dto.CreateUserDto;
 import com.example.first.dto.UserDTO;
+import com.example.first.dto.UserFilter;
 import com.example.first.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
@@ -28,8 +29,8 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<UserDTO>> getAllUsers(Pageable pageable) {
-        Page<UserDTO> users = userService.getAllUsers(pageable);
+    public ResponseEntity<Page<UserDTO>> getAllUsers(UserFilter userFilter, Pageable pageable) {
+        Page<UserDTO> users = userService.getAllUsers(userFilter, pageable);
         return ResponseEntity.ok(users);
     }
 
