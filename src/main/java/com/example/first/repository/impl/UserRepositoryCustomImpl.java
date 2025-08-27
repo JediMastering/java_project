@@ -1,11 +1,13 @@
 package com.example.first.repository.impl;
 
 import com.example.first.dto.UserFilter;
-import com.example.first.entity.QUser;
 import com.example.first.entity.User;
 import com.example.first.repository.UserRepositoryCustom;
 import com.querydsl.core.BooleanBuilder;
-import com.querydsl.jpa.impl.JPAQuery;
+import com.example.first.entity.QUser;
+
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.annotation.PostConstruct;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.springframework.data.domain.Page;
@@ -18,6 +20,13 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
 
     @PersistenceContext
     private EntityManager entityManager;
+
+    private JPAQueryFactory queryFactory;
+
+    @PostConstruct
+    public void init() {
+        queryFactory = new JPAQueryFactory(entityManager);
+    }
 
     @Override
     public Page<User> findAll(UserFilter filter, Pageable pageable) {
@@ -36,14 +45,13 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
             predicate.and(user.roles.any().name.containsIgnoreCase(filter.getRole()));
         }
 
-        JPAQuery<User> query = new JPAQuery<>(entityManager);
-        List<User> users = query.from(user)
+        List<User> users = queryFactory.selectFrom(user)
                 .where(predicate)
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
 
-        long total = query.fetchCount();
+        long total = queryFactory.selectFrom(user).where(predicate).fetchCount();
 
         return new PageImpl<>(users, pageable, total);
     }
