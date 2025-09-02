@@ -24,11 +24,6 @@ public class UserSpecification {
                         "%" + filter.getEmail().toLowerCase() + "%"));
             }
 
-            if (filter.getRole() != null && !filter.getRole().isEmpty()) {
-                predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.join("roles").get("name")),
-                        "%" + filter.getRole().toLowerCase() + "%"));
-            }
-
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };
     }

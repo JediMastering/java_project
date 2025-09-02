@@ -3,10 +3,10 @@ package com.example.first.service.impl;
 import com.example.first.dto.CreateUserDto;
 import com.example.first.dto.UserDTO;
 import com.example.first.dto.UserFilter;
-import com.example.first.entity.Role;
+import com.example.first.entity.AccessGroup;
 import com.example.first.entity.User;
 import com.example.first.exception.EntityNotFoundException;
-import com.example.first.repository.RoleRepository;
+import com.example.first.repository.AccessGroupRepository;
 import com.example.first.repository.UserRepository;
 import com.example.first.service.UserService;
 import org.springframework.data.domain.Page;
@@ -14,36 +14,38 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Set;
+import java.util.HashSet;
 import java.util.UUID;
 
 @Service
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
-    private final RoleRepository roleRepository;
+    private final AccessGroupRepository accessGroupRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public UserServiceImpl(UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
+    public UserServiceImpl(UserRepository userRepository, AccessGroupRepository accessGroupRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
-        this.roleRepository = roleRepository;
+        this.accessGroupRepository = accessGroupRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
     @Override
     public UserDTO createUser(CreateUserDto createUserDto) {
         userRepository.findByUsername(createUserDto.username())
-            .ifPresent(user -> {
-                throw new IllegalArgumentException("User already exists");
-            });
+                .ifPresent(user -> {
+                    throw new IllegalArgumentException("User already exists");
+                });
 
-        Role basicRole = roleRepository.findByName(Role.Values.BASIC.name())
-                .orElseThrow(() -> new IllegalArgumentException("Role not found"));
+        java.util.Set<AccessGroup> accessGroups = new HashSet<>(accessGroupRepository.findAllById(createUserDto.accessGroupIds()));
+        if (accessGroups.isEmpty()) {
+            throw new IllegalArgumentException("At least one valid access group must be provided.");
+        }
 
         User user = new User();
         user.setUsername(createUserDto.username());
         user.setPassword(passwordEncoder.encode(createUserDto.password()));
-        user.setRoles(Set.of(basicRole));
+        user.setAccessGroups(accessGroups);
 
         User savedUser = userRepository.save(user);
 
@@ -52,6 +54,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Page<UserDTO> getAllUsers(UserFilter userFilter, Pageable pageable) {
+        // TODO: Implementar filtro por permissões se necessário, por enquanto apenas busca todos
         return userRepository.findAll(userFilter, pageable)
                 .map(user -> new UserDTO(user.getUserId(), user.getUsername()));
     }
@@ -71,8 +74,14 @@ public class UserServiceImpl implements UserService {
     public UserDTO updateUser(UUID userId, CreateUserDto createUserDto) {
         User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(userId.getMostSignificantBits(), User.class));
 
+        java.util.Set<AccessGroup> accessGroups = new HashSet<>(accessGroupRepository.findAllById(createUserDto.accessGroupIds()));
+        if (accessGroups.isEmpty()) {
+            throw new IllegalArgumentException("At least one valid access group must be provided.");
+        }
+
         user.setUsername(createUserDto.username());
         user.setPassword(passwordEncoder.encode(createUserDto.password()));
+        user.setAccessGroups(accessGroups);
 
         User updatedUser = userRepository.save(user);
 

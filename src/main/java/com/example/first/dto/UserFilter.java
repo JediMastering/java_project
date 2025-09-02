@@ -8,5 +8,5 @@ import lombok.Setter;
 public class UserFilter {
     private String name;
     private String email;
-    private String role;
 }
+

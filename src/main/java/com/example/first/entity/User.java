@@ -8,6 +8,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.example.first.dto.LoginRequest;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -32,11 +33,11 @@ public class User {
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
-            name = "tb_users_roles",
+            name = "tb_users_access_groups",
             joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id")
+            inverseJoinColumns = @JoinColumn(name = "access_group_id")
     )
-    private Set<Role> roles;
+    private Set<AccessGroup> accessGroups = new HashSet<>();
 
     public boolean isLoginCorrect(LoginRequest loginRequest, PasswordEncoder passwordEncoder) {
         return passwordEncoder.matches(loginRequest.password(), this.password);

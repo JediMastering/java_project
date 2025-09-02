@@ -41,10 +41,6 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
             predicate.and(user.email.containsIgnoreCase(filter.getEmail()));
         }
 
-        if (filter.getRole() != null && !filter.getRole().isEmpty()) {
-            predicate.and(user.roles.any().name.containsIgnoreCase(filter.getRole()));
-        }
-
         List<User> users = queryFactory.selectFrom(user)
                 .where(predicate)
                 .offset(pageable.getOffset())
