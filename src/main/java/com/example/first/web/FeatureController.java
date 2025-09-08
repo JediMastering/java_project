@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/features")
+@RequestMapping("/permissions")
 public class FeatureController {
 
     private final FeatureService featureService;
@@ -20,7 +20,8 @@ public class FeatureController {
     }
 
     @GetMapping
-    public ResponseEntity<List<FeatureDTO>> getFeatureTree() {
-        return ResponseEntity.ok(featureService.getFeatureTree());
+    public ResponseEntity<List<FeatureDTO>> getPermissions() {
+        List<FeatureDTO> permissions = featureService.getFeatureTree();
+        return ResponseEntity.ok(permissions);
     }
 }

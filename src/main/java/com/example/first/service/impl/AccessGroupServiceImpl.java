@@ -15,7 +15,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -54,10 +55,9 @@ public class AccessGroupServiceImpl implements AccessGroupService {
     }
 
     @Override
-    public List<AccessGroupResponseDTO> findAllAccessGroups() {
-        return accessGroupRepository.findAll().stream()
-                .map(this::toResponseDTO)
-                .collect(Collectors.toList());
+    public Page<AccessGroupResponseDTO> findAllAccessGroups(Pageable pageable) {
+        return accessGroupRepository.findAll(pageable)
+                .map(this::toResponseDTO);
     }
 
     @Override
@@ -68,13 +68,41 @@ public class AccessGroupServiceImpl implements AccessGroupService {
 
         accessGroup.setName(payload.name());
 
-        // Limpar permissões antigas
-        accessGroup.getPermissions().clear();
-        accessGroupPermissionRepository.deleteAll(accessGroup.getPermissions()); // Garantir que são deletadas do banco
+        Map<Long, AccessGroupPermission> existingPermissionsMap = accessGroup.getPermissions().stream()
+                .collect(Collectors.toMap(p -> p.getFeature().getId(), p -> p));
 
-        // Adicionar novas permissões
-        Set<AccessGroupPermission> newPermissions = buildPermissions(accessGroup, payload.permissions());
-        accessGroup.setPermissions(newPermissions);
+        Map<Long, PermissionActionsDTO> payloadPermissionsMap = payload.permissions();
+
+        // Update existing permissions and add new ones
+        for (Map.Entry<Long, PermissionActionsDTO> entry : payloadPermissionsMap.entrySet()) {
+            Long featureId = entry.getKey();
+            PermissionActionsDTO actions = entry.getValue();
+            AccessGroupPermission existingPermission = existingPermissionsMap.get(featureId);
+
+            if (existingPermission != null) {
+                // Update existing permission
+                existingPermission.setCanView(actions.view());
+                existingPermission.setCanCreate(actions.create());
+                existingPermission.setCanEdit(actions.edit());
+                existingPermission.setCanDelete(actions.delete());
+            } else {
+                // Add new permission
+                Feature feature = featureRepository.findById(featureId)
+                        .orElseThrow(() -> new RuntimeException("Feature not found with id: " + featureId));
+                AccessGroupPermission newPermission = new AccessGroupPermission();
+                newPermission.setAccessGroup(accessGroup);
+                newPermission.setFeature(feature);
+                newPermission.setCanView(actions.view());
+                newPermission.setCanCreate(actions.create());
+                newPermission.setCanEdit(actions.edit());
+                newPermission.setCanDelete(actions.delete());
+                accessGroup.getPermissions().add(newPermission);
+            }
+        }
+
+        // Remove permissions that are no longer in the payload
+        Set<Long> payloadFeatureIds = payloadPermissionsMap.keySet();
+        accessGroup.getPermissions().removeIf(permission -> !payloadFeatureIds.contains(permission.getFeature().getId()));
 
         AccessGroup updatedAccessGroup = accessGroupRepository.save(accessGroup);
         return toResponseDTO(updatedAccessGroup);

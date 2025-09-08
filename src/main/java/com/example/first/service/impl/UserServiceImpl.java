@@ -37,15 +37,14 @@ public class UserServiceImpl implements UserService {
                     throw new IllegalArgumentException("User already exists");
                 });
 
-        java.util.Set<AccessGroup> accessGroups = new HashSet<>(accessGroupRepository.findAllById(createUserDto.accessGroupIds()));
-        if (accessGroups.isEmpty()) {
-            throw new IllegalArgumentException("At least one valid access group must be provided.");
-        }
-
         User user = new User();
         user.setUsername(createUserDto.username());
         user.setPassword(passwordEncoder.encode(createUserDto.password()));
-        user.setAccessGroups(accessGroups);
+
+        if (createUserDto.accessGroupIds() != null && !createUserDto.accessGroupIds().isEmpty()) {
+            java.util.Set<AccessGroup> accessGroups = new HashSet<>(accessGroupRepository.findAllById(createUserDto.accessGroupIds()));
+            user.setAccessGroups(accessGroups);
+        }
 
         User savedUser = userRepository.save(user);
 
@@ -74,14 +73,15 @@ public class UserServiceImpl implements UserService {
     public UserDTO updateUser(UUID userId, CreateUserDto createUserDto) {
         User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(userId.getMostSignificantBits(), User.class));
 
-        java.util.Set<AccessGroup> accessGroups = new HashSet<>(accessGroupRepository.findAllById(createUserDto.accessGroupIds()));
-        if (accessGroups.isEmpty()) {
-            throw new IllegalArgumentException("At least one valid access group must be provided.");
-        }
-
         user.setUsername(createUserDto.username());
         user.setPassword(passwordEncoder.encode(createUserDto.password()));
-        user.setAccessGroups(accessGroups);
+
+        if (createUserDto.accessGroupIds() != null && !createUserDto.accessGroupIds().isEmpty()) {
+            java.util.Set<AccessGroup> accessGroups = new HashSet<>(accessGroupRepository.findAllById(createUserDto.accessGroupIds()));
+            user.setAccessGroups(accessGroups);
+        } else {
+            user.setAccessGroups(new HashSet<>());
+        }
 
         User updatedUser = userRepository.save(user);
 

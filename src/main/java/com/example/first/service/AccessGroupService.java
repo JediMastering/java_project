@@ -3,12 +3,13 @@ package com.example.first.service;
 import com.example.first.dto.AccessGroupPayloadDTO;
 import com.example.first.dto.AccessGroupResponseDTO;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface AccessGroupService {
     AccessGroupResponseDTO createAccessGroup(AccessGroupPayloadDTO payload);
     AccessGroupResponseDTO findAccessGroupById(Long id);
-    List<AccessGroupResponseDTO> findAllAccessGroups();
+    Page<AccessGroupResponseDTO> findAllAccessGroups(Pageable pageable);
     AccessGroupResponseDTO updateAccessGroup(Long id, AccessGroupPayloadDTO payload);
     void deleteAccessGroup(Long id);
 }

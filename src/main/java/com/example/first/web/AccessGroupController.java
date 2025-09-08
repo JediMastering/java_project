@@ -7,7 +7,8 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @RestController
 @RequestMapping("/access-groups")
@@ -32,8 +33,8 @@ public class AccessGroupController {
     }
 
     @GetMapping
-    public ResponseEntity<List<AccessGroupResponseDTO>> getAllAccessGroups() {
-        List<AccessGroupResponseDTO> groups = accessGroupService.findAllAccessGroups();
+    public ResponseEntity<Page<AccessGroupResponseDTO>> getAllAccessGroups(Pageable pageable) {
+        Page<AccessGroupResponseDTO> groups = accessGroupService.findAllAccessGroups(pageable);
         return ResponseEntity.ok(groups);
     }
 
