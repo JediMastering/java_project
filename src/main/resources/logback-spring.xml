@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/base.xml"/>
+
+    <appender name="EXCEPTION_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOGS_PATH:-./logs}/exceptions.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- daily rollover -->
+            <fileNamePattern>${LOGS_PATH:-./logs}/archived/exceptions.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <!-- keep 30 days' worth of history -->
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n%rEx</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Logger for capturing exceptions from GlobalExceptionHandler -->
+    <logger name="com.example.first.exception.GlobalExceptionHandler" level="ERROR" additivity="false">
+        <appender-ref ref="EXCEPTION_FILE" />
+    </logger>
+
+</configuration>
