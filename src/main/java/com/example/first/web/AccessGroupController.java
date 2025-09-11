@@ -4,11 +4,12 @@ import com.example.first.dto.AccessGroupPayloadDTO;
 import com.example.first.dto.AccessGroupResponseDTO;
 import com.example.first.service.AccessGroupService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import java.util.List;
 
 @RestController
 @RequestMapping("/access-groups")
@@ -35,6 +36,12 @@ public class AccessGroupController {
     @GetMapping
     public ResponseEntity<Page<AccessGroupResponseDTO>> getAllAccessGroups(Pageable pageable) {
         Page<AccessGroupResponseDTO> groups = accessGroupService.findAllAccessGroups(pageable);
+        return ResponseEntity.ok(groups);
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<List<AccessGroupResponseDTO>> getAllAccessGroups() {
+        List<AccessGroupResponseDTO> groups = accessGroupService.findAllAccessGroups();
         return ResponseEntity.ok(groups);
     }
 

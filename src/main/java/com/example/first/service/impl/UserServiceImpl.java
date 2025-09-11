@@ -1,6 +1,7 @@
 package com.example.first.service.impl;
 
 import com.example.first.dto.CreateUserDto;
+import com.example.first.dto.UpdateUserDto;
 import com.example.first.dto.UserDTO;
 import com.example.first.dto.UserFilter;
 import com.example.first.entity.AccessGroup;
@@ -15,7 +16,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -48,20 +51,20 @@ public class UserServiceImpl implements UserService {
 
         User savedUser = userRepository.save(user);
 
-        return new UserDTO(savedUser.getUserId(), savedUser.getUsername());
+        return toUserDTO(savedUser);
     }
 
     @Override
     public Page<UserDTO> getAllUsers(UserFilter userFilter, Pageable pageable) {
         // TODO: Implementar filtro por permissões se necessário, por enquanto apenas busca todos
         return userRepository.findAll(userFilter, pageable)
-                .map(user -> new UserDTO(user.getUserId(), user.getUsername()));
+                .map(this::toUserDTO);
     }
 
     @Override
     public UserDTO getUserById(UUID userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(userId.getMostSignificantBits(), User.class));
-        return new UserDTO(user.getUserId(), user.getUsername());
+        return toUserDTO(user);
     }
 
     @Override
@@ -70,21 +73,32 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDTO updateUser(UUID userId, CreateUserDto createUserDto) {
+    public UserDTO updateUser(UUID userId, UpdateUserDto updateUserDto) {
         User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(userId.getMostSignificantBits(), User.class));
 
-        user.setUsername(createUserDto.username());
-        user.setPassword(passwordEncoder.encode(createUserDto.password()));
+        if (updateUserDto.username() != null && !updateUserDto.username().isBlank()) {
+            user.setUsername(updateUserDto.username());
+        }
 
-        if (createUserDto.accessGroupIds() != null && !createUserDto.accessGroupIds().isEmpty()) {
-            java.util.Set<AccessGroup> accessGroups = new HashSet<>(accessGroupRepository.findAllById(createUserDto.accessGroupIds()));
+        if (updateUserDto.password() != null && !updateUserDto.password().isBlank()) {
+            // Add validation for password here if needed
+            user.setPassword(passwordEncoder.encode(updateUserDto.password()));
+        }
+
+        if (updateUserDto.accessGroupIds() != null) {
+            java.util.Set<AccessGroup> accessGroups = new HashSet<>(accessGroupRepository.findAllById(updateUserDto.accessGroupIds()));
             user.setAccessGroups(accessGroups);
-        } else {
-            user.setAccessGroups(new HashSet<>());
         }
 
         User updatedUser = userRepository.save(user);
 
-        return new UserDTO(updatedUser.getUserId(), updatedUser.getUsername());
+        return toUserDTO(updatedUser);
+    }
+
+    private UserDTO toUserDTO(User user) {
+        List<Long> accessGroupIds = user.getAccessGroups().stream()
+                .map(AccessGroup::getAccessGroupId)
+                .collect(Collectors.toList());
+        return new UserDTO(user.getUserId(), user.getUsername(), accessGroupIds);
     }
 }

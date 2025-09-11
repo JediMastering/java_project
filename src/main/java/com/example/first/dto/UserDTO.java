@@ -1,6 +1,7 @@
 package com.example.first.dto;
 
+import java.util.List;
 import java.util.UUID;
 
-public record UserDTO(UUID id, String username) {
+public record UserDTO(UUID id, String username, List<Long> accessGroupIds) {
 }

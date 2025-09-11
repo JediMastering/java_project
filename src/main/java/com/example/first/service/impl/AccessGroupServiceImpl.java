@@ -11,12 +11,13 @@ import com.example.first.repository.AccessGroupPermissionRepository;
 import com.example.first.repository.AccessGroupRepository;
 import com.example.first.repository.FeatureRepository;
 import com.example.first.service.AccessGroupService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -58,6 +59,13 @@ public class AccessGroupServiceImpl implements AccessGroupService {
     public Page<AccessGroupResponseDTO> findAllAccessGroups(Pageable pageable) {
         return accessGroupRepository.findAll(pageable)
                 .map(this::toResponseDTO);
+    }
+
+    @Override
+    public List<AccessGroupResponseDTO> findAllAccessGroups() {
+        return accessGroupRepository.findAll().stream()
+                .map(this::toResponseDTO)
+                .collect(Collectors.toList());
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.example.first.service;
 
 import com.example.first.dto.CreateUserDto;
+import com.example.first.dto.UpdateUserDto;
 import com.example.first.dto.UserDTO;
 import com.example.first.dto.UserFilter;
 import org.springframework.data.domain.Page;
@@ -18,5 +19,5 @@ public interface UserService {
 
     void deleteUser(UUID userId);
 
-    UserDTO updateUser(UUID userId, CreateUserDto createUserDto);
+    UserDTO updateUser(UUID userId, UpdateUserDto updateUserDto);
 }

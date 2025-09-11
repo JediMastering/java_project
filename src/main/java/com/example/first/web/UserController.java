@@ -1,6 +1,7 @@
 package com.example.first.web;
 
 import com.example.first.dto.CreateUserDto;
+import com.example.first.dto.UpdateUserDto;
 import com.example.first.dto.UserDTO;
 import com.example.first.dto.UserFilter;
 import com.example.first.service.UserService;
@@ -42,10 +43,9 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
-    @PutMapping()
-    public ResponseEntity<UserDTO> updateUser(@RequestBody @Valid CreateUserDto createUserDto, @AuthenticationPrincipal Jwt jwt) {
-        UUID userId = UUID.fromString(jwt.getSubject());
-        UserDTO updatedUser = userService.updateUser(userId, createUserDto);
+    @PutMapping("/{userId}")
+    public ResponseEntity<UserDTO> updateUser(@PathVariable UUID userId, @RequestBody @Valid UpdateUserDto updateUserDto) {
+        UserDTO updatedUser = userService.updateUser(userId, updateUserDto);
         return ResponseEntity.ok(updatedUser);
     }
 
