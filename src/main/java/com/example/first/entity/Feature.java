@@ -1,5 +1,6 @@
 package com.example.first.entity;
 
+import com.example.first.polymorphic.PolymorphicEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,7 +12,7 @@ import java.util.Set;
 @Table(name = "tb_features")
 @Getter
 @Setter
-public class Feature {
+public class Feature implements PolymorphicEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

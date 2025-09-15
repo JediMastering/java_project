@@ -7,16 +7,29 @@ import lombok.Setter;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.example.first.polymorphic.PolymorphicEntity;
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.util.HashSet;
+import java.util.Set;
+
 @Entity
 @Table(name = "tb_access_groups")
 @Getter
 @Setter
-public class AccessGroup {
+public class AccessGroup implements PolymorphicEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "access_group_id")
     private Long accessGroupId;
+
+    @Override
+    public Long getId() {
+        return this.accessGroupId;
+    }
 
     private String name;
 
