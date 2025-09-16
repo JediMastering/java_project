@@ -1,18 +1,23 @@
 package com.example.first.web;
 
+import com.example.first.config.AttachmentType;
 import com.example.first.dto.CreateUserDto;
 import com.example.first.dto.UpdateUserDto;
 import com.example.first.dto.UserDTO;
 import com.example.first.dto.UserFilter;
+import com.example.first.entity.Attachment;
+import com.example.first.service.AttachmentService;
 import com.example.first.service.UserService;
 import jakarta.validation.Valid;
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -20,9 +25,11 @@ import java.util.UUID;
 public class UserController {
 
     private final UserService userService;
+    private final AttachmentService attachmentService;
 
-    public UserController(UserService userService) {
+    public UserController(UserService userService, AttachmentService attachmentService) {
         this.userService = userService;
+        this.attachmentService = attachmentService;
     }
 
     @PostMapping
@@ -41,6 +48,30 @@ public class UserController {
     public ResponseEntity<UserDTO> getUserById(@PathVariable UUID userId) {
         UserDTO user = userService.getUserById(userId);
         return ResponseEntity.ok(user);
+    }
+
+    @GetMapping("/{userId}/profile-image")
+    public ResponseEntity<Resource> getUserProfileImage(@PathVariable UUID userId) {
+        List<Attachment> attachments = attachmentService.getAttachmentsForEntity("USER", userId.toString());
+
+        Optional<Attachment> profileImage = attachments.stream()
+                .filter(a -> AttachmentType.isImage(a.getFileType()))
+                .findFirst();
+
+        if (profileImage.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Attachment attachment = profileImage.get();
+        Resource resource = attachmentService.loadFileAsResource(attachment.getId());
+
+        MediaType mediaType = AttachmentType.fromName(attachment.getFileType())
+                .map(AttachmentType::getMediaType)
+                .orElse(MediaType.APPLICATION_OCTET_STREAM);
+
+        return ResponseEntity.ok()
+                .contentType(mediaType)
+                .body(resource);
     }
 
     @PutMapping("/{userId}")

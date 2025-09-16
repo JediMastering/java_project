@@ -1,22 +1,28 @@
 package com.example.first.service.impl;
 
+import com.example.first.config.AttachmentType;
 import com.example.first.dto.CreateUserDto;
 import com.example.first.dto.UpdateUserDto;
 import com.example.first.dto.UserDTO;
 import com.example.first.dto.UserFilter;
 import com.example.first.entity.AccessGroup;
+import com.example.first.entity.Attachment;
 import com.example.first.entity.User;
 import com.example.first.exception.EntityNotFoundException;
+import com.example.first.exception.UserAlreadyExistsException;
 import com.example.first.repository.AccessGroupRepository;
 import com.example.first.repository.UserRepository;
+import com.example.first.service.AttachmentService;
 import com.example.first.service.UserService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -26,18 +32,20 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final AccessGroupRepository accessGroupRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AttachmentService attachmentService;
 
-    public UserServiceImpl(UserRepository userRepository, AccessGroupRepository accessGroupRepository, PasswordEncoder passwordEncoder) {
+    public UserServiceImpl(UserRepository userRepository, AccessGroupRepository accessGroupRepository, PasswordEncoder passwordEncoder, AttachmentService attachmentService) {
         this.userRepository = userRepository;
         this.accessGroupRepository = accessGroupRepository;
         this.passwordEncoder = passwordEncoder;
+        this.attachmentService = attachmentService;
     }
 
     @Override
     public UserDTO createUser(CreateUserDto createUserDto) {
         userRepository.findByUsername(createUserDto.username())
                 .ifPresent(user -> {
-                    throw new IllegalArgumentException("User already exists");
+                    throw new UserAlreadyExistsException("User already exists");
                 });
 
         User user = new User();
@@ -56,7 +64,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Page<UserDTO> getAllUsers(UserFilter userFilter, Pageable pageable) {
-        // TODO: Implementar filtro por permissões se necessário, por enquanto apenas busca todos
         return userRepository.findAll(userFilter, pageable)
                 .map(this::toUserDTO);
     }
@@ -81,7 +88,6 @@ public class UserServiceImpl implements UserService {
         }
 
         if (updateUserDto.password() != null && !updateUserDto.password().isBlank()) {
-            // Add validation for password here if needed
             user.setPassword(passwordEncoder.encode(updateUserDto.password()));
         }
 
@@ -99,6 +105,17 @@ public class UserServiceImpl implements UserService {
         List<Long> accessGroupIds = user.getAccessGroups().stream()
                 .map(AccessGroup::getAccessGroupId)
                 .collect(Collectors.toList());
-        return new UserDTO(user.getUserId(), user.getUsername(), accessGroupIds);
+
+        String profileImageUrl = attachmentService.getAttachmentsForEntity("USER", user.getUserId().toString()).stream()
+                .filter(a -> AttachmentType.isImage(a.getFileType()))
+                .findFirst()
+                .map(attachment -> ServletUriComponentsBuilder.fromCurrentContextPath()
+                        .path("/users/")
+                        .path(user.getUserId().toString())
+                        .path("/profile-image")
+                        .toUriString())
+                .orElse(null);
+
+        return new UserDTO(user.getUserId(), user.getUsername(), profileImageUrl, accessGroupIds);
     }
 }
