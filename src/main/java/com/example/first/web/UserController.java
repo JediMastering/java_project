@@ -14,11 +14,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/users")
@@ -33,25 +33,29 @@ public class UserController {
     }
 
     @PostMapping
+    @PreAuthorize("hasPermission('users', 'create')")
     public ResponseEntity<UserDTO> createUser(@RequestBody @Valid CreateUserDto createUserDto) {
         UserDTO createdUser = userService.createUser(createUserDto);
         return ResponseEntity.ok(createdUser);
     }
 
     @GetMapping
+    @PreAuthorize("hasPermission('users', 'view')")
     public ResponseEntity<Page<UserDTO>> getAllUsers(UserFilter userFilter, Pageable pageable) {
         Page<UserDTO> users = userService.getAllUsers(userFilter, pageable);
         return ResponseEntity.ok(users);
     }
 
     @GetMapping("/{userId}")
-    public ResponseEntity<UserDTO> getUserById(@PathVariable UUID userId) {
+    @PreAuthorize("hasPermission('users', 'view')")
+    public ResponseEntity<UserDTO> getUserById(@PathVariable Long userId) {
         UserDTO user = userService.getUserById(userId);
         return ResponseEntity.ok(user);
     }
 
     @GetMapping("/{userId}/profile-image")
-    public ResponseEntity<Resource> getUserProfileImage(@PathVariable UUID userId) {
+    @PreAuthorize("hasPermission('users', 'view')")
+    public ResponseEntity<Resource> getUserProfileImage(@PathVariable Long userId) {
         List<Attachment> attachments = attachmentService.getAttachmentsForEntity("USER", userId.toString());
 
         Optional<Attachment> profileImage = attachments.stream()
@@ -75,13 +79,15 @@ public class UserController {
     }
 
     @PutMapping("/{userId}")
-    public ResponseEntity<UserDTO> updateUser(@PathVariable UUID userId, @RequestBody @Valid UpdateUserDto updateUserDto) {
+    @PreAuthorize("hasPermission('users', 'edit')")
+    public ResponseEntity<UserDTO> updateUser(@PathVariable Long userId, @RequestBody @Valid UpdateUserDto updateUserDto) {
         UserDTO updatedUser = userService.updateUser(userId, updateUserDto);
         return ResponseEntity.ok(updatedUser);
     }
 
     @DeleteMapping("/{userId}")
-    public ResponseEntity<Void> deleteUser(@PathVariable UUID userId) {
+    @PreAuthorize("hasPermission('users', 'delete')")
+    public ResponseEntity<Void> deleteUser(@PathVariable Long userId) {
         userService.deleteUser(userId);
         return ResponseEntity.noContent().build();
     }

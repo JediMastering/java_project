@@ -4,13 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import org.springframework.security.crypto.password.PasswordEncoder;
-
-import com.example.first.dto.LoginRequest;
-
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 
 @Entity
 @Table(name = "tb_users")
@@ -19,9 +14,9 @@ import java.util.UUID;
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
-    private UUID userId;
+    private Long userId;
 
     @Column(unique = true)
     private String username;
@@ -38,8 +33,4 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "access_group_id")
     )
     private Set<AccessGroup> accessGroups = new HashSet<>();
-
-    public boolean isLoginCorrect(LoginRequest loginRequest, PasswordEncoder passwordEncoder) {
-        return passwordEncoder.matches(loginRequest.password(), this.password);
-    }
 }

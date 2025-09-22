@@ -33,6 +33,6 @@ public class AccessGroup implements PolymorphicEntity {
 
     private String name;
 
-    @OneToMany(mappedBy = "accessGroup", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "accessGroup", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private Set<AccessGroupPermission> permissions = new HashSet<>();
 }

@@ -22,8 +22,6 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -69,19 +67,19 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDTO getUserById(UUID userId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(userId.getMostSignificantBits(), User.class));
+    public UserDTO getUserById(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(userId, User.class));
         return toUserDTO(user);
     }
 
     @Override
-    public void deleteUser(UUID userId) {
+    public void deleteUser(Long userId) {
         userRepository.deleteById(userId);
     }
 
     @Override
-    public UserDTO updateUser(UUID userId, UpdateUserDto updateUserDto) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(userId.getMostSignificantBits(), User.class));
+    public UserDTO updateUser(Long userId, UpdateUserDto updateUserDto) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException(userId, User.class));
 
         if (updateUserDto.username() != null && !updateUserDto.username().isBlank()) {
             user.setUsername(updateUserDto.username());
