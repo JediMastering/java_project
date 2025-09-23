@@ -38,11 +38,20 @@ public class AdminUserConfig implements CommandLineRunner {
     @Override
     @Transactional
     public void run(String... args) throws Exception {
-        featureRepository.saveAll(Arrays.asList(
+        List<Feature> featuresToCreate = Arrays.asList(
                 new Feature("home", null, true, false, false, false),
                 new Feature("users", null, true, true, true, true),
                 new Feature("access-groups", null, true, true, true, true)
-        ));
+        );
+
+        for (Feature feature : featuresToCreate) {
+            featureRepository.findByName(feature.getName()).ifPresentOrElse(
+                    existingFeature -> {
+                        // Feature already exists, do nothing
+                    },
+                    () -> featureRepository.save(feature)
+            );
+        }
 
         AccessGroup superAdminGroup = accessGroupRepository.findByName("SUPER_ADMIN")
                 .orElseGet(() -> {

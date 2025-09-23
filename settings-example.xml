@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0
+                              https://maven.apache.org/xsd/settings-1.0.0.xsd">
+
+  <!--
+  ==============================================================================
+  | INSTRUÇÕES                                                                 |
+  ==============================================================================
+  |
+  | Para configurar seu ambiente, copie o conteúdo do perfil <profile> abaixo 
+  | para o seu arquivo ~/.m2/settings.xml e preencha os valores corretos.
+  |
+  ==============================================================================
+  -->
+
+  <profiles>
+    <profile>
+      <id>dev</id>
+      <properties>
+        <!-- Configuração do Banco de Dados para Geração de Código jOOQ -->
+        <jooq.db.driver>com.mysql.cj.jdbc.Driver</jooq.db.driver>
+        <jooq.db.url>jdbc:mysql://localhost:3306/mydatabase</jooq.db.url>
+        <jooq.db.user>myuser</jooq.db.user>
+        <jooq.db.password>myuserpassword</jooq.db.password>
+      </properties>
+    </profile>
+  </profiles>
+
+  <activeProfiles>
+    <activeProfile>dev</activeProfile>
+  </activeProfiles>
+
+</settings>

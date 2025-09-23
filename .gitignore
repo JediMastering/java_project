@@ -34,4 +34,15 @@ build/
 
 # Arquivos gerados pela aplicação
 /logs
-/uploads
+.idea/
+.vscode/
+logs/
+/target/
+/uploads/
+*.log
+
+# Maven
+.mvn/wrapper/maven-wrapper.jar
+
+# Local configuration files
+settings.xml
