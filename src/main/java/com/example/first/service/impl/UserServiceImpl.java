@@ -43,11 +43,17 @@ public class UserServiceImpl implements UserService {
     public UserDTO createUser(CreateUserDto createUserDto) {
         userRepository.findByUsername(createUserDto.username())
                 .ifPresent(user -> {
-                    throw new UserAlreadyExistsException("User already exists");
+                    throw new UserAlreadyExistsException("A user with this username already exists", "username");
+                });
+
+        userRepository.findByEmail(createUserDto.email())
+                .ifPresent(user -> {
+                    throw new UserAlreadyExistsException("A user with this email already exists", "email");
                 });
 
         User user = new User();
         user.setUsername(createUserDto.username());
+        user.setEmail(createUserDto.email());
         user.setPassword(passwordEncoder.encode(createUserDto.password()));
 
         if (createUserDto.accessGroupIds() != null && !createUserDto.accessGroupIds().isEmpty()) {
@@ -114,6 +120,6 @@ public class UserServiceImpl implements UserService {
                         .toUriString())
                 .orElse(null);
 
-        return new UserDTO(user.getUserId(), user.getUsername(), profileImageUrl, accessGroupIds);
+        return new UserDTO(user.getUserId(), user.getUsername(), user.getEmail(), profileImageUrl, accessGroupIds);
     }
 }

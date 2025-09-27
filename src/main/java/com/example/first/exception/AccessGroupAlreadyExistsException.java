@@ -3,11 +3,11 @@ package com.example.first.exception;
 import lombok.Getter;
 
 @Getter
-public class UserAlreadyExistsException extends RuntimeException {
+public class AccessGroupAlreadyExistsException extends RuntimeException {
 
     private final String field;
 
-    public UserAlreadyExistsException(String message, String field) {
+    public AccessGroupAlreadyExistsException(String message, String field) {
         super(message);
         this.field = field;
     }

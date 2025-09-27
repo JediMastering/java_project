@@ -82,7 +82,15 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
     private Map<Long, User> mapRecordsToUsersWithGroups(Result<Record> records) {
         Map<Long, User> userMap = new LinkedHashMap<>();
         for (Record r : records) {
-            User user = userMap.computeIfAbsent(r.get(TB_USERS.USER_ID), id -> r.into(TB_USERS).into(User.class));
+            Long userId = r.get(TB_USERS.USER_ID);
+            User user = userMap.computeIfAbsent(userId, id -> {
+                User newUser = new User();
+                newUser.setUserId(r.get(TB_USERS.USER_ID));
+                newUser.setUsername(r.get(TB_USERS.USERNAME));
+                newUser.setEmail(r.get(TB_USERS.EMAIL));
+                newUser.setPassword(r.get(TB_USERS.PASSWORD));
+                return newUser;
+            });
 
             if (r.get(TB_ACCESS_GROUPS.ACCESS_GROUP_ID) != null) {
                 AccessGroup group = r.into(TB_ACCESS_GROUPS).into(AccessGroup.class);

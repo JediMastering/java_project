@@ -6,6 +6,7 @@ import com.example.first.dto.PermissionActionsDTO;
 import com.example.first.entity.AccessGroup;
 import com.example.first.entity.AccessGroupPermission;
 import com.example.first.entity.Feature;
+import com.example.first.exception.AccessGroupAlreadyExistsException;
 import com.example.first.exception.EntityNotFoundException;
 import com.example.first.repository.AccessGroupPermissionRepository;
 import com.example.first.repository.AccessGroupRepository;
@@ -38,6 +39,10 @@ public class AccessGroupServiceImpl implements AccessGroupService {
     @Override
     @Transactional
     public AccessGroupResponseDTO createAccessGroup(AccessGroupPayloadDTO payload) {
+        accessGroupRepository.findByName(payload.name()).ifPresent(ag -> {
+            throw new AccessGroupAlreadyExistsException("An access group with this name already exists", "name");
+        });
+
         AccessGroup accessGroup = new AccessGroup();
         accessGroup.setName(payload.name());
 

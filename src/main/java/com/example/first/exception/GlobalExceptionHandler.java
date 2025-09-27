@@ -6,6 +6,9 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import com.example.first.exception.AccessGroupAlreadyExistsException;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -31,10 +34,32 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(body, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    @ExceptionHandler({AccessDeniedException.class, AuthorizationDeniedException.class})
+    public ResponseEntity<Object> handleAccessDeniedException(Exception ex, WebRequest request) {
+        Map<String, Object> body = new HashMap<>();
+        body.put("message", "Você não tem autorização para executar esta ação.");
+        return new ResponseEntity<>(body, HttpStatus.FORBIDDEN);
+    }
+
     @ExceptionHandler(UserAlreadyExistsException.class)
     public ResponseEntity<Object> handleUserAlreadyExistsException(UserAlreadyExistsException ex, WebRequest request) {
+        Map<String, String> detail = new HashMap<>();
+        detail.put("field", ex.getField());
+        detail.put("message", ex.getMessage());
+
         Map<String, Object> body = new HashMap<>();
-        body.put("message", ex.getMessage());
+        body.put("details", List.of(detail));
+        return new ResponseEntity<>(body, HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(AccessGroupAlreadyExistsException.class)
+    public ResponseEntity<Object> handleAccessGroupAlreadyExistsException(AccessGroupAlreadyExistsException ex, WebRequest request) {
+        Map<String, String> detail = new HashMap<>();
+        detail.put("field", ex.getField());
+        detail.put("message", ex.getMessage());
+
+        Map<String, Object> body = new HashMap<>();
+        body.put("details", List.of(detail));
         return new ResponseEntity<>(body, HttpStatus.CONFLICT);
     }
 
