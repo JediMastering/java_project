@@ -46,7 +46,10 @@ public class SecurityConfig {
 
         http
                 .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/login").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/forgot-password").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/reset-password").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/attachments/upload").authenticated()
                         .anyRequest().authenticated())
                 .csrf(csrf -> csrf.disable())
