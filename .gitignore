@@ -47,3 +47,4 @@ logs/
 # Local configuration files
 settings.xml
 set-env.sh
+.env
