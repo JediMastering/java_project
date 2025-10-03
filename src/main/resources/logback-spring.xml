@@ -37,6 +37,7 @@
     <!-- Root logger - applies to the whole application -->
     <root level="INFO">
         <appender-ref ref="FILE" />
+        <appender-ref ref="CONSOLE" />
     </root>
 
 </configuration>
