@@ -1,0 +1,101 @@
+# Category API Documentation
+
+This document provides the details for the Category API endpoints.
+
+---
+
+## 1. Get All Categories
+
+- **Description:** Retrieves all categories for the authenticated user. By default, it only returns active categories.
+- **Endpoint:** `GET /api/categories`
+- **Query Parameters:**
+  - `includeInactive` (boolean, optional, default: `false`): Set to `true` to include inactive categories in the response.
+- **Success Response (200 OK):**
+  ```json
+  [
+    {
+      "id": 1,
+      "name": "Salaries",
+      "active": true
+    },
+    {
+      "id": 2,
+      "name": "Office Supplies",
+      "active": true
+    }
+  ]
+  ```
+
+---
+
+## 2. Get Category by ID
+
+- **Description:** Retrieves a single category by its ID.
+- **Endpoint:** `GET /api/categories/{id}`
+- **URL Parameters:**
+  - `id` (number, required): The ID of the category.
+- **Success Response (200 OK):**
+  ```json
+  {
+    "id": 1,
+    "name": "Salaries",
+    "active": true
+  }
+  ```
+- **Error Response (404 Not Found):** If the category does not exist or does not belong to the user.
+
+---
+
+## 3. Create Category
+
+- **Description:** Creates a new category for the authenticated user.
+- **Endpoint:** `POST /api/categories`
+- **Request Body:**
+  ```json
+  {
+    "name": "New Category Name"
+  }
+  ```
+- **Success Response (201 Created):**
+  ```json
+  {
+    "id": 3,
+    "name": "New Category Name",
+    "active": true
+  }
+  ```
+
+---
+
+## 4. Update Category
+
+- **Description:** Updates an existing category's name.
+- **Endpoint:** `PUT /api/categories/{id}`
+- **URL Parameters:**
+  - `id` (number, required): The ID of the category to update.
+- **Request Body:**
+  ```json
+  {
+    "name": "Updated Category Name"
+  }
+  ```
+- **Success Response (200 OK):**
+  ```json
+  {
+    "id": 1,
+    "name": "Updated Category Name",
+    "active": true
+  }
+  ```
+- **Error Response (404 Not Found):** If the category does not exist or does not belong to the user.
+
+---
+
+## 5. Delete Category (Soft Delete)
+
+- **Description:** Deactivates a category, marking it as inactive. This is a soft delete.
+- **Endpoint:** `DELETE /api/categories/{id}`
+- **URL Parameters:**
+  - `id` (number, required): The ID of the category to deactivate.
+- **Success Response (240 No Content):** The response will have an empty body.
+- **Error Response (404 Not Found):** If the category does not exist or does not belong to the user.
